@@ -1,25 +1,33 @@
 import {humanizeAmount, zeroDecimalCurrencies} from "medusa-core-utils"
 import {BaseService} from "medusa-interfaces"
-import {LineItem, Logger, OrderService, Payment, RegionService, TotalsService} from "@medusajs/medusa";
+import {EventBusService, Logger, OrderService, Payment, RegionService, TotalsService} from "@medusajs/medusa";
 import {InvoiceAhoyPluginOptions} from "src/types";
-import {InvoiceAhoy as IaClient} from "invoiceahoy";
+import {CreateInvoiceResponse, InvoiceAhoy as IaClient, Item} from "invoiceahoy";
+import {EntityManager} from "typeorm";
+import {Invoice} from "../models/invoice";
 
 class InvoiceAhoy extends BaseService {
 
+  protected readonly manager: EntityManager;
   protected readonly orderService_: OrderService;
   protected readonly totalsService_: TotalsService;
   protected readonly regionService_: RegionService;
+  protected readonly eventBus_: EventBusService;
+  protected readonly invoice2Model_: Invoice;
   protected readonly options_: InvoiceAhoyPluginOptions;
   protected readonly logger_: Logger;
 
 
   constructor(params: any, options: InvoiceAhoyPluginOptions) {
     super()
-    const {orderService, totalsService, regionService, logger} = params;
+    const {manager, orderService, totalsService, regionService, logger, invoiceModel, eventBusService} = params;
+    this.manager_ = manager
     this.logger_ = logger;
     this.orderService_ = orderService
     this.totalsService_ = totalsService
+    this.invoice2Model_ = invoiceModel
     this.regionService_ = regionService
+    this.eventBus_ = eventBusService
     this.options_ = options
   }
 
@@ -47,17 +55,6 @@ class InvoiceAhoy extends BaseService {
         "shipping_methods.shipping_option",
         "payments",
         "fulfillments",
-        "returns",
-        "gift_cards",
-        "gift_card_transactions",
-        "swaps",
-        "swaps.return_order",
-        "swaps.payment",
-        "swaps.shipping_methods",
-        "swaps.shipping_methods.shipping_option",
-        "swaps.shipping_address",
-        "swaps.additional_items",
-        "swaps.fulfillments",
       ],
     })
 
@@ -87,9 +84,9 @@ class InvoiceAhoy extends BaseService {
     }
 
 
-    const items = [];
+    const items: Item[] = [];
     for (const lineItem of order.items) {
-      const totals = await this.totalsService_.getLineItemTotals(
+      const lineItemTotals = await this.totalsService_.getLineItemTotals(
         lineItem,
         order,
         {
@@ -97,14 +94,14 @@ class InvoiceAhoy extends BaseService {
         }
       )
 
-      this.logger_.info(`LineItemTotals ${JSON.stringify(totals)}`)
-      this.logger_.debug(`Adding item to invoice: ${lineItem.title} ${lineItem.quantity} ${currencyCode}${lineItem.total}`)
+      this.logger_.debug(`Adding item to invoice: ${lineItem.title} ${lineItem.quantity} ${getDisplayAmount(lineItem.total)}`)
       items.push({
         name: lineItem.title,
         quantity: lineItem.quantity,
         unit_price: lineItem.unit_price,
         total: lineItem.total,
         discount_total: lineItem.discount_total,
+        tax_total: lineItemTotals.tax_total,
       })
     }
     const activityId = logger.activity("Sending API request...")
@@ -156,8 +153,30 @@ class InvoiceAhoy extends BaseService {
         discount_total: (discount_total)
       }
     })
-    logger.success(activityId, "Invoice created");
-    logger.log(invoice);
+    logger.success(activityId, `Invoice created ${JSON.stringify(invoice)}`);
+    await this.createInvoice(orderId, invoice);
+
+    this.logger_.debug(`Emitting "invoice.created" for id=${invoice.id}`);
+    await this.eventBus_.emit(
+      "invoice.created",
+      {invoice},
+    )
+  }
+
+  async createInvoice(orderId: string, input: CreateInvoiceResponse) {
+    this.logger_.debug(`Storing invoice in db..`);
+    const invoiceRepo = this.manager_.getRepository(
+      this.invoice2Model_
+    );
+    this.logger_.debug(`Storing invoice in db..`);
+    const invoice = invoiceRepo.create()
+    invoice.external_id = input.id;
+    invoice.order_id = orderId;
+    invoice.doc_number = input.doc_number;
+
+    const result = await invoiceRepo.save(invoice);
+    this.logger_.debug(`Created invoice record ${invoice.id}`);
+    return result;
   }
 }
 

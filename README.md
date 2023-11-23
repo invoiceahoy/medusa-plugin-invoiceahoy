@@ -96,6 +96,10 @@ Order in `Medusa Backend Portal`.
 
 ---
 
+## Events
+
+"invoice.created"
+
 ## Other channels
 
 - [GitHub Issues](https://github.com/invoiceahoy/medusa-plugin-invoiceahoy/issues)
