@@ -10,11 +10,11 @@
   "license": "MIT",
   "keywords": [
     "medusa-plugin",
+    "medusa-plugin-notification",
     "medusa",
     "invoice",
-    "typescript",
-    "ecommerce",
-    "headless"
+    "invoiceahoy",
+    "ecommerce"
   ],
   "files": [
     "dist"
