@@ -21,15 +21,12 @@
   ],
   "scripts": {
     "clean": "cross-env ./node_modules/.bin/rimraf dist",
-    "build": "cross-env npm run clean && npm run build:server",
-    "build:server": "cross-env npm run clean && tsc -p tsconfig.server.json",
+    "build": "cross-env yarn clean && yarn build:server",
+    "build:server": "cross-env yarn clean && tsc -p tsconfig.server.json",
     "build:admin": "cross-env medusa-admin build",
     "watch": "cross-env tsc --watch",
-    "test": "cross-env jest",
-    "seed": "cross-env medusa seed -f ./data/seed.json",
-    "start": "cross-env npm run build && medusa start",
-    "start:custom": "cross-env npm run build && node --preserve-symlinks --trace-warnings index.js",
-    "dev": "cross-env npm run build:server && medusa develop"
+    "test": "jest --passWithNoTests",
+    "prepare": "cross-env NODE_ENV=production yarn run build"
   },
   "dependencies": {
     "@medusajs/cache-inmemory": "^1.8.9",

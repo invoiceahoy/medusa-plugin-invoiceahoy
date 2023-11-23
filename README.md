@@ -36,7 +36,9 @@ The plugin subscribes to `order` events and creates an invoice for the order.
 ## Features
 
 - Automatically create compliant PDF & HTML invoices from Medusa Orders
+- Invoices are accessible from the Backend portal
 - Benefit from InvoiceAhoy's advanced invoicing features like localization
+- The plugin is in active development. If you have any feature requests, please open an issue.
 
 ---
 
