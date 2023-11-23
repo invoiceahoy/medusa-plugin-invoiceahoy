@@ -1,6 +1,6 @@
 {
   "name": "medusa-plugin-invoiceahoy",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A Medusa Commerce plugin to create invoices with InvoiceAhoy.",
   "author": "InvoiceAhoy (https://invoiceahoy.com)",
   "repository": {
