@@ -1,43 +1,15 @@
-<p align="center">
-  <a href="https://invoiceahoy.com">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://avatars.githubusercontent.com/u/151521744?s=100&v=4">
-    <source media="(prefers-color-scheme: light)" srcset="https://avatars.githubusercontent.com/u/151521744?s=100&v=4">
-    <img alt="InvoiceAhoy logo" src="https://avatars.githubusercontent.com/u/151521744?s=100&v=4">
-    </picture>
-  </a>
-</p>
-<h1 align="center">
-  InvoiceAhoy
-</h1>
+# InvoiceAhoy
 
-<h4 align="center">
-  <a href="https://invoiceahoy.com/docs">Documentation</a> |
-  <a href="https://invoiceahoy.com">Website</a>
-</h4>
+Create invoices for Medusa orders.
 
-<p align="center">
- A Medusa Commerce plugin to create invoices with InvoiceAhoy
-</p>
-<p align="center">
-   <a href="https://discord.gg/6N92PHZh">
-    <img src="https://img.shields.io/badge/chat-on%20discord-7289DA.svg" alt="Discord Chat" />
-  </a>
-</p>
+[Website](https://invoiceahoy.com) | [Documentation](https://invoiceahoy.com/docs)
 
-# InvoiceAhoy <> Medusa
 
-A Medusa Commerce plugin to create invoices with InvoiceAhoy.
-
-The plugin subscribes to `order` events and creates an invoice for the order.
-
----
 
 ## Features
 
-- Automatically create compliant PDF & HTML invoices from Medusa Orders
-- Invoices are accessible from the Backend portal
-- Benefit from InvoiceAhoy's advanced invoicing features like localization
+- Automatically create compliant PDF & HTML invoices from Medusa orders.
+- Invoices are accessible from the Backend portal.
 - The plugin is in active development. If you have any feature requests, please open an issue.
 
 ---
@@ -69,13 +41,13 @@ The plugin subscribes to `order` events and creates an invoice for the order.
   const plugins = [
     // ...
     {
-      resolve: `medusa-plugin-invoiceahoy`,
-      options: {
-        logo_url: "https://invoiceahoy.com/ia_logo.svg",  // the logo to add to the invoice
-        api_key: process.env.INVOICEAHOY_API_KEY, // required
-      },
+        resolve: `medusa-plugin-invoiceahoy`,
+        options: {
+            logo_url: "https://invoiceahoy.com/ia_logo.svg",  // the logo to add to the invoice
+            api_key: process.env.INVOICEAHOY_API_KEY, // required
+        },
     },
-  ]
+]
   ```
 
 ---
@@ -88,7 +60,7 @@ The plugin subscribes to `order` events and creates an invoice for the order.
   npm run start
   ```
 
-2\. Place an order using a storefront or the [Store APIs](https://docs.medusajs.com/api/store). 
+2\. Place an order using a storefront or the [Store APIs](https://docs.medusajs.com/api/store).
 If using the `Manual Payment` option, visit the `Backend Portal` and manually capture the payment.
 
 3\. Verify that the invoice was created by checking your [InvoiceAhoy account](https://invoiceahoy.com/app) or the
@@ -98,7 +70,9 @@ Order in `Medusa Backend Portal`.
 
 ## Events
 
-"invoice.created"
+When an invoice is created, the "invoice.created" event is published with the invoice details.
+This can be used to retrieve the invoice artifacts (pdf / html) and deliver it to
+the customer in a downstream service.
 
 ## Other channels
 
