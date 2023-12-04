@@ -3,6 +3,8 @@
   "compilerOptions": {
     "module": "esnext"
   },
-  "include": ["src/admin"],
+  "include": [
+    "../medusa-ia-storefront/admin"
+  ],
   "exclude": ["**/*.spec.js"]
 }

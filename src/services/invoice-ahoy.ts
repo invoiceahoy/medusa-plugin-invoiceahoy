@@ -153,8 +153,22 @@ class InvoiceAhoy extends BaseService {
         discount_total: (discount_total)
       }
     })
-    logger.success(activityId, `Invoice created ${JSON.stringify(invoice)}`);
+
     await this.createInvoice(orderId, invoice);
+    logger.success(activityId, `Invoice created ${JSON.stringify(invoice)}`);
+
+    if (this.options_.send?.enabled && email) {
+      this.logger_.debug(`Sending invoice to customer id=${invoice.id}`);
+      const {
+        from, subject, cc = []
+      } = this.options_.send;
+      await client.invoices.send(invoice.id, {
+        from,
+        to: email,
+        subject,
+        cc
+      });
+    }
 
     this.logger_.debug(`Emitting "invoice.created" for id=${invoice.id}`);
     await this.eventBus_.emit(

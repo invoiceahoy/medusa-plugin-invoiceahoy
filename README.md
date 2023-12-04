@@ -45,6 +45,12 @@ Create invoices for Medusa orders.
         options: {
             logo_url: "https://invoiceahoy.com/ia_logo.svg",  // the logo to add to the invoice
             api_key: process.env.INVOICEAHOY_API_KEY, // required
+            send: {
+                enabled: true, // whether to send the invoice to the customer
+                subject: "Thanks for your order ({{order_number}})", // the subject of the email
+                from: "My Store", // the name of the sender
+                cc: ["orders@mystore.com"], // cc emails
+            }
         },
     },
 ]
